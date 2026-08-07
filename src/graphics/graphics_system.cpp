@@ -30,6 +30,7 @@
 #include <rex/ui/graphics_provider.h>
 #include <rex/ui/window.h>
 #include <rex/ui/windowed_app_context.h>
+#include <timeapi.h>
 
 REXCVAR_DEFINE_STRING(trace_gpu_prefix, "", "GPU", "GPU trace file prefix");
 
@@ -121,6 +122,7 @@ X_STATUS GraphicsSystem::SetupPresentation(ui::WindowedAppContext* app_context) 
 
 X_STATUS GraphicsSystem::SetupGuestGpu(runtime::FunctionDispatcher* function_dispatcher,
                                        system::KernelState* kernel_state) {
+  timeBeginPeriod(1);
   memory_ = function_dispatcher->memory();
   function_dispatcher_ = function_dispatcher;
   kernel_state_ = kernel_state;
@@ -187,6 +189,8 @@ X_STATUS GraphicsSystem::SetupGuestGpu(runtime::FunctionDispatcher* function_dis
 }
 
 void GraphicsSystem::Shutdown() {
+  timeEndPeriod(1);
+
   if (command_processor_) {
     EndTracing();
     command_processor_->Shutdown();
